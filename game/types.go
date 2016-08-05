@@ -19,6 +19,7 @@ type Song struct {
 // with four title options that are the same genre
 type PickResult struct {
 	Song    *Song    `json:"-"`
+	SongId  string   `json:"id"`
 	Options []string `json:"options"`
 }
 
@@ -30,6 +31,6 @@ func NewSong(id, title, start, genre string) *Song {
 	return &Song{id, title, start, genre}
 }
 
-func NewPickResult(song *Song, options []string) *PickResult {
-	return &PickResult{song, options}
+func NewPickResult(song *Song, id string, options []string) *PickResult {
+	return &PickResult{song, id, options}
 }
