@@ -1,13 +1,12 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
 	"github.com/pusher/foobar-server/game"
 	"github.com/pusher/pusher-http-go"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 )
 
 func rootHandler(w http.ResponseWriter, req *http.Request) {
@@ -16,6 +15,12 @@ func rootHandler(w http.ResponseWriter, req *http.Request) {
 
 // Starts a new gamge (admin)
 func gameHandler(w http.ResponseWriter, req *http.Request) {
+	if gameManager.OngoingGame {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("There is already a game in progress"))
+		return
+	}
+
 	// send a signal to start the game
 	gameManager.StartChannel <- struct{}{}
 
@@ -25,24 +30,23 @@ func gameHandler(w http.ResponseWriter, req *http.Request) {
 
 // pusher presence channel auth
 func pusherAuthHandler(w http.ResponseWriter, req *http.Request) {
-	var playerParams map[string]string
-
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
+		log.Printf("Failed to read request body in pusher auth: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	bodyCopy := bytes.NewBuffer(body)
-	decoder := json.NewDecoder(bodyCopy)
-	if err := decoder.Decode(&playerParams); err != nil {
+	queryParams, err := url.ParseQuery(string(body))
+	if err != nil {
+		log.Printf("Failed parse query params: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	playerEmail, ok := playerParams["email"]
-	if !ok {
-		w.WriteHeader(http.StatusInternalServerError)
+	playerEmail := queryParams.Get("email")
+	if playerEmail == "" {
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -66,6 +70,7 @@ func pusherAuthHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.WriteHeader(http.StatusOK)
 	w.Write(response)
 }
@@ -117,8 +122,6 @@ func webhookHandler(w http.ResponseWriter, req *http.Request) {
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
-
-		log.Printf("Player leaving game: %s", player.Email)
 
 		gameManager.PlayerLeftChannel <- player
 

@@ -11,8 +11,8 @@ var Pusher *pusher.Client
 func init() {
 	Pusher = &pusher.Client{
 		AppId:  os.Getenv("PUSHER_APP_ID"),
-		Key:    os.Getenv("PUSHER_APP_KEY"),
-		Secret: os.Getenv("PUSHER_APP_SECRET"),
+		Key:    os.Getenv("PUSHER_KEY"),
+		Secret: os.Getenv("PUSHER_SECRET"),
 	}
 }
 

@@ -50,6 +50,7 @@ func (s *Store) ClearQueuedPlayers() {
 // Add player to queue
 func (s *Store) AddQueuedPlayer(player *Player) {
 	s.QueuedPlayers = append(s.QueuedPlayers, player)
+	s.PrintQueuedPlayers()
 }
 
 // Move all players in the queue to the current game
@@ -57,31 +58,37 @@ func (s *Store) AddQueuedPlayersToCurrentPlayers() {
 	for _, p := range s.QueuedPlayers {
 		s.CurrentPlayers = append(s.CurrentPlayers, p)
 	}
+	s.PrintCurrentPlayers()
 }
 
 // Remove player from queue
 func (s *Store) RemoveQueuedPlayer(player *Player) {
-	s.removePlayer(s.QueuedPlayers, player)
-}
-
-// Generic remove player function
-func (s *Store) removePlayer(from []*Player, player *Player) {
-	for i, p := range from {
+	for i, p := range s.QueuedPlayers {
 		if p.Email == player.Email {
-			from = append(from[:i], from[i+1:]...)
+			s.QueuedPlayers = append(s.QueuedPlayers[:i], s.QueuedPlayers[i+1:]...)
 			break
 		}
 	}
+
+	s.PrintQueuedPlayers()
 }
 
 // Add a player to the current game
 func (s *Store) AddCurrentPlayer(player *Player) {
 	s.CurrentPlayers = append(s.CurrentPlayers, player)
+	s.PrintCurrentPlayers()
 }
 
 // Remove player from the current game
 func (s *Store) RemoveCurrentPlayer(player *Player) {
-	s.removePlayer(s.CurrentPlayers, player)
+	for i, p := range s.CurrentPlayers {
+		if p.Email == player.Email {
+			s.CurrentPlayers = append(s.CurrentPlayers[:i], s.CurrentPlayers[i+1:]...)
+			break
+		}
+	}
+
+	s.PrintCurrentPlayers()
 }
 
 // Generic function to see if player is any list
@@ -93,6 +100,30 @@ func (s *Store) playerInList(list []*Player, player *Player) bool {
 	}
 
 	return false
+}
+
+func (s *Store) printPlayers(list []*Player) {
+	for _, player := range list {
+		log.Print(player.Email)
+	}
+}
+
+func (s *Store) PrintQueuedPlayers() {
+	log.Println("---QUEUED PLAYERS---")
+	if len(s.QueuedPlayers) > 0 {
+		s.printPlayers(s.QueuedPlayers)
+	} else {
+		log.Println("NO QUEUED PLAYERS")
+	}
+}
+
+func (s *Store) PrintCurrentPlayers() {
+	log.Println("---CURRENT PLAYERS---")
+	if len(s.CurrentPlayers) > 0 {
+		s.printPlayers(s.CurrentPlayers)
+	} else {
+		log.Println("NO CURRENT PLAYERS")
+	}
 }
 
 // Check if player is in the queue

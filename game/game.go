@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	GameChannel      = "foobar-game"
+	GameChannel      = "presence-foobar-game"
 	GameStartEvent   = "start"
 	GameEndEvent     = "end"
 	GameOngoingEvent = "ongoing"
@@ -53,6 +53,6 @@ func (g *Game) Start(songPick *PickResult) {
 
 // Signal the start of a game via Pusher
 func (g *Game) triggerPusherEvent(eventName string, data string) {
-	log.Println("Triggering start of game on Pusher")
+	log.Printf("Triggering %s with data %s on Pusher", eventName, data)
 	Pusher.Trigger(GameChannel, eventName, data)
 }
