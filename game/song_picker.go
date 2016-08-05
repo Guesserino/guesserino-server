@@ -18,8 +18,8 @@ func NewSongPicker(songs []*Song) *SongPicker {
 }
 
 func (sp *SongPicker) Pick() *PickResult {
-	pickedSong := sp.pickSong()
-	return NewPickResult(pickedSong, pickedSong.Id, sp.findOptionsForChosenSong(pickedSong))
+	ps := sp.pickSong()
+	return NewPickResult(ps, ps.Id, ps.Start, sp.findOptionsForChosenSong(ps))
 }
 
 func (sp *SongPicker) pickSong() *Song {
