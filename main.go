@@ -25,5 +25,5 @@ func main() {
 	http.HandleFunc("/pusher/auth", pusherAuthHandler)
 	http.HandleFunc("/pusher/webhook", webhookHandler)
 
-	http.ListenAndServe(":"+os.Getenv("HTTP_PORT"), nil)
+	http.ListenAndServe(":"+os.Getenv("PORT"), nil)
 }
