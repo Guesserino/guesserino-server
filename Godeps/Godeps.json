@@ -1,0 +1,11 @@
+{
+	"ImportPath": "github.com/pusher/foobar-server",
+	"GoVersion": "go1.6.2",
+	"Deps": [
+		{
+			"ImportPath": "github.com/pusher/pusher-http-go",
+			"Comment": "v1.1.0-10-g2bba5f2",
+			"Rev": "2bba5f217f6f0f4f0c0a9bb11b945b206b32bec5"
+		}
+	]
+}
