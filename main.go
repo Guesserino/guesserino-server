@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/pusher/foobar-server/game"
 	"net/http"
+	"os"
 )
 
 var (
@@ -24,5 +25,5 @@ func main() {
 	http.HandleFunc("/pusher/auth", pusherAuthHandler)
 	http.HandleFunc("/pusher/webhook", webhookHandler)
 
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":"+os.Getenv("HTTP_PORT"), nil)
 }
