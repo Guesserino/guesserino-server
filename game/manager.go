@@ -1,23 +1,14 @@
 package game
 
 import (
-	"github.com/pusher/pusher-http-go"
 	"log"
-	"os"
 )
 
-var Pusher *pusher.Client
-
-func init() {
-	Pusher = &pusher.Client{
-		AppId:  os.Getenv("PUSHER_APP_ID"),
-		Key:    os.Getenv("PUSHER_KEY"),
-		Secret: os.Getenv("PUSHER_SECRET"),
-	}
-}
-
 const (
-	DefaultGameTime = 15
+	// This just represents the time at which
+	// the answer is send, the actual game time
+	// is 15s, managed by the client
+	DefaultGameTime = 10
 )
 
 // Manages games, including setting up new games
@@ -108,8 +99,6 @@ func (m *Manager) Setup() {
 		case <-endChan:
 			log.Println("GAME ENDED")
 			m.OngoingGame = false
-
-			game.triggerPusherEvent(GameEndEvent, "{}")
 		}
 	}
 }

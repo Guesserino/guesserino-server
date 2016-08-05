@@ -18,7 +18,7 @@ type Song struct {
 // Represents a song that has been picked
 // with four title options that are the same genre
 type PickResult struct {
-	Song    *Song    `json:"song"`
+	Song    *Song    `json:"-"`
 	Options []string `json:"options"`
 }
 

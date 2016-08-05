@@ -2,9 +2,21 @@ package game
 
 import (
 	"encoding/json"
+	"github.com/pusher/pusher-http-go"
 	"log"
+	"os"
 	"time"
 )
+
+var Pusher *pusher.Client
+
+func init() {
+	Pusher = &pusher.Client{
+		AppId:  os.Getenv("PUSHER_APP_ID"),
+		Key:    os.Getenv("PUSHER_KEY"),
+		Secret: os.Getenv("PUSHER_SECRET"),
+	}
+}
 
 const (
 	GameChannel      = "presence-foobar-game"
@@ -45,7 +57,11 @@ func (g *Game) Start(songPick *PickResult) {
 	for {
 		select {
 		case <-time.After(DefaultGameTime * time.Second):
-			// game has ended
+			st, err := json.Marshal(songPick.Song)
+			if err != nil {
+				log.Printf("Failed to JSON encode song result: %s", err.Error())
+			}
+			g.triggerPusherEvent(GameEndEvent, string(st))
 			return
 		}
 	}
@@ -54,5 +70,9 @@ func (g *Game) Start(songPick *PickResult) {
 // Signal the start of a game via Pusher
 func (g *Game) triggerPusherEvent(eventName string, data string) {
 	log.Printf("Triggering %s with data %s on Pusher", eventName, data)
-	Pusher.Trigger(GameChannel, eventName, data)
+
+	_, err := Pusher.Trigger(GameChannel, eventName, data)
+	if err != nil {
+		log.Printf("Failed to trigger event: %s", err.Error())
+	}
 }
